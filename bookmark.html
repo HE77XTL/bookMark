@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://qidian.gtimg.com/lulu/pure/css/common/ui.css">
+    <link rel="stylesheet" href="https://qidian.gtimg.com/lulu/pure/css/common/color.css">
+    <script src="https://qidian.gtimg.com/lulu/pure/js/common/all.js"></script>
+    <title>bookmark</title>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+
+        ul, li {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .dodo-pad {
+            padding: 12px;
+        }
+
+        .dodo-app {
+            background: white;
+            width: 100vw;
+            height: 100vh;
+            box-sizing: border-box;
+            display: grid;
+            grid-template-columns: 180px auto;
+            grid-template-rows: 60px auto;
+            grid-template-areas: 'header header' 'menu content';
+        }
+
+        .dodo-header {
+            grid-area: header;
+            border-bottom: solid 1px gray;
+        }
+
+        .dodo-menu {
+            grid-area: menu;
+            border-right: solid 1px gray;
+        }
+
+        .dodo-menu .menu {
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 320ms;
+        }
+
+        .dodo-menu .menu:hover {
+            background: rgba(42, 128, 235, 0.1);
+        }
+
+        .menu.active {
+            color: white;
+            background: #2a80eb;
+        }
+
+        .dodo-menu .menu.active:hover {
+            color: white;
+            background: #2a80eb;
+        }
+
+        .dodo-content {
+            grid-area: content;
+            min-width: 960px;
+            overflow: auto;
+        }
+
+        .dodo-content .bookmark {
+            padding: 12px;
+            display: none;
+        }
+
+        .dodo-content .bookmark.active {
+            display: block;
+        }
+
+        .markPanel {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .markPanel .markItem {
+            /*border: solid 1px #2a80eb;*/
+            padding: 4px 8px;
+            width: 320px;
+            font-size: 16px;
+            line-height: 22px;
+            height: 22px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin: 6px 8px;
+        }
+
+        .markPanel a {
+            text-decoration: none;
+
+        }
+
+
+    </style>
+</head>
+<body>
+<div class="dodo-app">
+    <div class="dodo-header dodo-pad">书签</div>
+    <div class="dodo-menu" id="markMenu"></div>
+    <div id="markContent" class="dodo-content"></div>
+</div>
+<script>
+    const bookMark = {
+        html: {
+            menuName: "html",
+            data: [
+                {
+                    markUrl: "https://developers.google.com/web?hl=zh-cn",
+                    markName: "developersWeb"
+                }
+            ]
+        },
+        css: {
+            menuName: "css",
+            data: [
+                {
+                    markUrl: "https://fontawesome.dashgame.com",
+                    markName: "Font Awesome 一套绝佳的图标字体库和CSS框架"
+                }
+            ]
+        },
+        js: {
+            menuName: "js",
+            data: [
+                {
+                    markUrl: "https://jkchao.github.io/typescript-book-chinese/",
+                    markName: "深入理解 TypeScript"
+                },
+                {
+                    markUrl: "https://legacy.gitbook.com/@llh911001",
+                    markName: "函数式编程指北"
+                },
+                {
+                    markUrl: "https://ts.xcatliu.com/introduction/what-is-typescript.html",
+                    markName: "TypeScript 入门教程"
+                },
+                {
+                    markUrl: "https://blog.csdn.net/weixin_42448623/article/details/104773280#axioscreateconfig__axios_147",
+                    markName: "axios 的理解和使用 axios.create(对axios请求进行二次封装) 拦截器 取消请求(axios.CancelToken)"
+                },
+            ]
+        },
+        tool:{
+            menuName: "工具",
+            data: [
+                {
+                    markUrl: "https://git-scm.com/book/zh/v2",
+                    markName: "git文档"
+                },
+                {
+                    markUrl: "https://opendocs.alipay.com/open/204",
+                    markName: "支付宝开放平台文档"
+                },
+                {
+                    markUrl: "https://chrisniael.gitbooks.io/gitbook-documentation/content/",
+                    markName: "GitBook文档（中文版）"
+                },
+                {
+                    markUrl: "https://www.jianshu.com/p/5f671aca2b5a",
+                    markName: "Jenkins详细教程"
+                },
+                {
+                    markUrl: "https://sortablejs.github.io/Sortable/",
+                    markName: "SortableJS"
+                },
+                {
+                    markUrl: "http://www.miit.gov.cn/",
+                    markName: "中华人民共和国工业和信息化部"
+                },
+                {
+                    markUrl: "https://www.miiteec.org.cn/plus/view.php?aid=779",
+                    markName: "工业和信息化部教育与考试中心关于召开Web前端开发职业技能等级证书试点工作说明会的通知_工业和信息化部教育与考试中心"
+                },
+                {
+                    markUrl: "http://www.kaihuhang.cn/88743/",
+                    markName: "全国银行开户行联行号查询网"
+                },
+                {
+                    markUrl: "https://www.boomsse.com/cart.php",
+                    markName: "Boom.Cloud"
+                },
+                {
+                    markUrl: "http://www.51yuansu.com/?z=lvhaidtxw,%E5%85%8D%E8%B4%B9%E9%A2%86%E7%BB%88%E8%BA%ABvip",
+                    markName: "觅元素_设计元素的免费下载网站_免抠素材51yuansu.com"
+                },
+            ]
+        },
+        vue: {
+            menuName: "vue",
+            data: [
+                {
+                    markUrl: "https://www.jianshu.com/p/394c487d81d7",
+                    markName: "vue自定义指令，比onerror更优雅的方式实现当图片加载失败时使用默认图"
+                },
+                {
+                    markUrl: "https://juejin.im/post/5b20b9fe518825137d78b9c4",
+                    markName: "用Vue实现海报排版设计功能"
+                },
+                {
+                    markUrl: "https://juejin.im/post/5d08a5c2f265da1bb003c0f8",
+                    markName: "uni-app缓存器的封装"
+                },
+                {
+                    markUrl: "https://www.html5plus.org/doc/zh_cn/barcode.html",
+                    markName: "H5 中国产业联盟"
+                },
+                {
+                    markUrl: "https://youzan.github.io/vant/#/zh-CN/",
+                    markName: "vant UI"
+                },
+                {
+                    markUrl: "https://www.jianshu.com/p/d50e543223b8",
+                    markName: "vue-cli 3.0脚手架cli-service配置（简书）"
+                },
+                {
+                    markUrl: "https://www.jianshu.com/p/2459e6fe05ca",
+                    markName: "Vue与iOS的通信"
+                },
+                {
+                    markUrl: "https://github.com/opendigg/awesome-github-vue",
+                    markName: "Vue相关开源项目库集合"
+                },
+                {
+                    markUrl: "https://blog.csdn.net/weixin_38644883/article/details/84978085",
+                    markName: "vue-cli3中 vue.config.js 文件说明"
+                },
+                {
+                    markUrl: "https://zhuanlan.zhihu.com/p/86273758",
+                    markName: "Vue.js中 watch(深度监听)"
+                },
+            ]
+        },
+        react: {
+            menuName: 'react',
+            data: [
+                {
+                    markUrl: "https://lanhuapp.com/web/#/item/project/board?pid=dfb37f92-0410-4095-bd24-571d3fdb21fe",
+                    markName: "蓝狐4"
+                }
+            ]
+        },
+        pkmb: {
+            menuName: '屏客名榜',
+            data: [
+                {
+                    markUrl: "https://lanhuapp.com/web/#/item/project/board?pid=dfb37f92-0410-4095-bd24-571d3fdb21fe",
+                    markName: "蓝狐"
+                },
+                {
+                    markUrl: "http://192.168.31.63:8083/oms/doc.html",
+                    markName: "pk-63-oms"
+                },
+                {
+                    markUrl: "http://192.168.31.63:8082/mall/doc.html",
+                    markName: "pk-63-mall"
+                },
+                {
+                    markUrl: "http://192.168.31.63:8080/user/doc.html",
+                    markName: "pk-63-user"
+                },
+                {
+                    markUrl: "http://192.168.31.63:8081/order/doc.html",
+                    markName: "pk-63-order"
+                },
+            ]
+        },
+        linux: {
+            menuName: 'linux',
+            data: [
+                {
+                    markUrl: "https://lanhuapp.com/web/#/item/project/board?pid=dfb37f92-0410-4095-bd24-571d3fdb21fe",
+                    markName: "蓝狐4"
+                }
+            ]
+        },
+        ci: {
+            menuName: 'ci',
+            data: [
+                {
+                    markUrl: "https://segmentfault.com/a/1190000011890710",
+                    markName: "gitlab-ci配置详解(二)"
+                },
+                {
+                    markUrl: "https://xiaozhuanlan.com/topic/9423856710",
+                    markName: "持续集成与 Git 工作流"
+                },
+                {
+                    markUrl: "https://cn.trunkbaseddevelopment.com/",
+                    markName: "主干开发"
+                },
+            ]
+        },
+        blog: {
+            menuName: '博客',
+            data: [
+                {
+                    markUrl: "https://jkchao.cn/",
+                    markName: "三毛"
+                },
+                {
+                    markUrl: "https://www.phodal.com/",
+                    markName: "phodal"
+                },
+                {
+                    markUrl: "https://juejin.im/post/5b514bef518825018c4ce28e",
+                    markName: "记一次Vue Hybrid App（混合APP）开发"
+                },
+                {
+                    markUrl: "https://tech.youzan.com/git-subtree/",
+                    markName: "用 Git Subtree 在多个 Git 项目间双向同步子项目，附简明使用手册"
+                 },
+                {
+                    markUrl: "https://blog.ihipop.info/2017/03/4943.html",
+                    markName: "说一说 Git Subtree"
+                },
+                {
+                    markUrl: "https://insights.thoughtworks.cn/gitflow-consider-harmful/",
+                    markName: "Gitflow有害论"
+                },
+                {
+                    markUrl: "https://segmentfault.com/a/1190000006110417",
+                    markName: "如何优雅的选择字体(font-family)"
+                },
+                {
+                    markUrl: "http://www.brofive.org/?p=2165",
+                    markName: "Git 代码分支模型（1）：GitFlow、GitHub Flow、Trunk Based Development"
+                },
+                {
+                    markUrl: "http://www.fidding.me/article/111",
+                    markName: "gitlab-runner如何更改执行用户"
+                },
+                {
+                    markUrl: "https://juejin.im/post/5cb92f67e51d456e896349f7",
+                    markName: "Gitlab自动部署之四：使用Gitlab-runner部署Gitlab的项目(掘金)"
+                },
+                {
+                    markUrl: "https://www.jianshu.com/p/8a837d830459",
+                    markName: "git subtree：无缝管理通用子项目"
+                },
+                {
+                    markUrl: "https://juejin.im/post/5b27682f6fb9a00e733f121e",
+                    markName: "axios源码分析——取消请求"
+                },
+                {
+                    markUrl: "https://www.jianshu.com/p/22b49e6ad819",
+                    markName: "axios取消接口请求"
+                },
+                {
+                    markUrl: "https://zhuanlan.zhihu.com/p/54088373",
+                    markName: "反馈在人机交互中的重要性"
+                },
+                {
+                    markUrl: "https://zhuanlan.zhihu.com/p/53289347",
+                    markName: "纯JS实现文件上传小工具"
+                },
+                {
+                    markUrl: "https://zhuanlan.zhihu.com/p/86273758",
+                    markName: "Vue.js中 watch(深度监听)"
+                },
+                {
+                    markUrl: "https://www.jianshu.com/p/dee9f8b14771",
+                    markName: "最详尽的 JS 原型与原型链终极详解，没有「可能是」"
+                },
+                {
+                    markUrl: "https://github.com/answershuto/learnVue",
+                    markName: "answershuto/learnVue: Vue.js 源码解析"
+                },
+                {
+                    markUrl: "https://lbs.qq.com/service/webService/webServiceGuide/webServiceOverview",
+                    markName: "WebService API | 腾讯位置服务"
+                },
+                {
+                    markUrl: "https://www.jianshu.com/p/fcb648efc3de",
+                    markName: "exec、match、test等使用正则表达式的函数区别"
+                },
+                {
+                    markUrl: "https://houdunren.gitee.io/note/js/1%20%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86.html",
+                    markName: "后盾人"
+                },
+            ]
+        },
+        theme: {
+            menuName: '主题',
+            data: [
+                {
+                    markUrl: "https://lanhuapp.com/web/#/item/project/board?pid=dfb37f92-0410-4095-bd24-571d3fdb21fe",
+                    markName: "蓝狐4"
+                }
+            ]
+        }
+    };
+
+    function render(menu) {
+        const nLis = [];
+        const nContentItems = [];
+        for (let key in menu) {
+            // 菜单
+            nLis.push(`<li class="menu" data-id="${key}">${menu[key].menuName}</li>`);
+            // 内容
+            const markList = menu[key].data;
+            const markString = markList.map(markItem => {
+                return (
+                    `<div class="markItem"><a href="${markItem.markUrl}" target="_blank">${markItem.markName}</a></div>`
+                )
+            }).join('');
+            const markPanel = `<div id="${key}" class="bookmark dodo-pad"><div class="markPanel">${markString}</div></div>`;
+            nContentItems.push(markPanel);
+        }
+        const nUl = `<ul>${nLis.join('')}</ul>`;
+        const nContent = `<div class="contentTemplate">${nContentItems.join((''))}</div>`;
+        const domParser = new DOMParser();
+        const doc = domParser.parseFromString(nUl + nContent, 'text/html');
+        return {
+            menu: doc.querySelector('ul'),
+            content: doc.querySelector('.contentTemplate')
+        };
+    }
+
+    const markMenu = document.getElementById('markMenu');
+    const markContent = document.getElementById('markContent');
+    markMenu.appendChild(render(bookMark).menu);
+    markContent.appendChild(render(bookMark).content)
+</script>
+<script type="text/javascript">
+    window.onload = function () {
+        const menus = document.querySelector('.dodo-menu');
+        const defaultActive = menus.querySelector('li');
+        const ActiveContent = document.getElementById(defaultActive.getAttribute('data-id'));
+        defaultActive.classList.add("active");
+        ActiveContent.classList.add('active');
+
+        delegate(menus, 'click', 'li', toggleMenu);
+
+        function addActiveClass(el) {
+            if (el) {
+                const allBrother = el.parentNode.children;
+                for (let i = 0; i < allBrother.length; i++) {
+                    const brotherNode = allBrother[i];
+                    brotherNode.classList.remove('active');
+                }
+                el.classList.add('active')
+            }
+        }
+
+        function toggleMenu(e, el) {
+            const bookMarkId = el.getAttribute('data-id');
+            const bookMarkNode = document.getElementById(bookMarkId);
+            addActiveClass(el);
+            addActiveClass(bookMarkNode);
+        }
+
+        function delegate(element, eventType, selector, fn) {
+            element.addEventListener(eventType, e => {
+                let el = e.target;
+                while (!el.matches(selector)) {
+                    if (element === el) {
+                        el = null;
+                        break
+                    }
+                    el = el.parentNode
+                }
+                el && fn.call(el, e, el)
+            });
+            return element
+        }
+    }
+</script>
+</body>
+</html>
